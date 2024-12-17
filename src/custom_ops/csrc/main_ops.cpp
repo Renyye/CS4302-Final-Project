@@ -4,10 +4,12 @@
 
 // 声明在其他cpp文件中定义的函数
 torch::Tensor custom_bmm(torch::Tensor A, torch::Tensor B);
-// torch::Tensor custom_vecAdd(torch::Tensor A, torch::Tensor B);
+torch::Tensor custom_vecAdd(torch::Tensor A, torch::Tensor B);
+torch::Tensor custom_matMul(torch::Tensor A, torch::Tensor B);
 
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
     m.def("custom_bmm_cuda", &custom_bmm, "Batched Matrix Multiplication");
-    // m.def("custom_vecAdd_cuda", &custom_vecAdd, "Custom Vector Addition");
+    m.def("custom_vecAdd_cuda", &custom_vecAdd, "Custom Vector Addition");
+    m.def("custom_matMul_cuda", &custom_matMul, "Custom Vector Addition");
     // 此处还可以绑定更多在其他文件中实现的函数
 }
