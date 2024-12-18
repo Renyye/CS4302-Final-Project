@@ -10,3 +10,10 @@
 1. 在 `.cu` 文件中封装函数
 2. 在 `main_ops.cpp` 中注册算子
 3. 在 `setup.py` 中添加源文件
+
+## Todo
+`test.py` 中无误差，但 `benchmark` 中有误。
+
+- [ ] 比较 `custom_transformer` 和 `native_transformer`，找到 bug。
+- [ ] 优化算子
+- [ ] 扩展算子
