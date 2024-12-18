@@ -13,5 +13,8 @@ clean:
 benchmark:
 	python scripts/benchmark.py
 
+count:
+	python /home/wrt/code/pytorch/tools/kernel_count/kernel_count.py scripts/benchmark.py
+
 .PHONY: FORCE
 FORCE:
