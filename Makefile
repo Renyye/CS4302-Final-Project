@@ -5,3 +5,7 @@ build:
 
 test:
 	python test.py
+
+clean:
+	pip uninstall custom_ops -y
+	python setup.py clean
