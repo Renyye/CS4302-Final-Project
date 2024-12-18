@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.init as init
 import custom_ops  # 你的自定义算子模块
 
 class CustomTransformerLayer(nn.Module):
@@ -22,6 +23,14 @@ class CustomTransformerLayer(nn.Module):
 
         self.dropout = nn.Dropout(dropout)
         self.activation = nn.ReLU()
+        # 自定义初始化（全部初始化为0）
+        self._initialize_weights()
+
+    def _initialize_weights(self):
+        for name, param in self.named_parameters():
+            init.constant_(param, 0.01)
+
+
 
     def forward(self, src):
         # Self-Attention部分
@@ -33,7 +42,6 @@ class CustomTransformerLayer(nn.Module):
         # 需要将Q和K转置以匹配矩阵乘法的维度
         K = custom_ops.custom_transpose_cuda(K)  # [B, E, S]
         attn_scores = custom_ops.custom_bmm_cuda(Q, K)  # [B, S, S]
-
 
         attn_weights = torch.softmax(attn_scores, dim=2)
 
@@ -50,6 +58,7 @@ class CustomTransformerLayer(nn.Module):
         ff_output = self.activation(ff_output)
         ff_output = self.feedforward2(ff_output)
         ff_output = self.dropout(ff_output)
+
         src = custom_ops.custom_vecAdd_cuda(src, ff_output)  # 残差连接
         src = self.layernorm2(src)
 

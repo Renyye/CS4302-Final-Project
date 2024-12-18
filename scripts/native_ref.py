@@ -1,9 +1,10 @@
 import torch
 import torch.nn as nn
+import torch.nn.init as init
 
-class CustomTransformerLayer(nn.Module):
+class NativeTransformerLayer(nn.Module):
     def __init__(self, embed_dim, num_heads, dim_feedforward, dropout=0.1):
-        super(CustomTransformerLayer, self).__init__()
+        super(NativeTransformerLayer, self).__init__()
         self.embed_dim = embed_dim
         self.num_heads = num_heads
         self.dim_feedforward = dim_feedforward
@@ -25,12 +26,21 @@ class CustomTransformerLayer(nn.Module):
         # Dropout 层
         self.dropout = nn.Dropout(dropout)
         self.activation = nn.ReLU()  # 或者使用 nn.GELU()
+        # 自定义初始化（全部初始化为0）
+        self._initialize_weights()
+
+    def _initialize_weights(self):
+        for name, param in self.named_parameters():
+            init.constant_(param, 0.01)
+
 
     def forward(self, src):
         # Self-Attention 部分
         Q = self.q_linear(src)  # [B, S, E]
         K = self.k_linear(src)
         V = self.v_linear(src)
+
+
 
         # 转置 K 以匹配矩阵乘法的维度
         K_transposed = K.transpose(1, 2)  # [B, E, S]
@@ -59,14 +69,13 @@ class CustomTransformerLayer(nn.Module):
         # 残差连接和层归一化
         src = src + ff_output  # [B, S, E]
         src = self.layernorm2(src)
-
         return src
 
-class CustomTransformer(nn.Module):
+class NativeTransformer(nn.Module):
     def __init__(self, num_layers, embed_dim, num_heads, dim_feedforward, dropout=0.1):
-        super(CustomTransformer, self).__init__()
+        super(NativeTransformer, self).__init__()
         self.layers = nn.ModuleList([
-            CustomTransformerLayer(embed_dim, num_heads, dim_feedforward, dropout)
+            NativeTransformerLayer(embed_dim, num_heads, dim_feedforward, dropout)
             for _ in range(num_layers)
         ])
         self.embed_dim = embed_dim
