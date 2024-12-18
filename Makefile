@@ -1,4 +1,4 @@
-build:
+build: FORCE
 	pip uninstall custom_ops -y
 	python setup.py clean
 	python setup.py install
@@ -9,3 +9,6 @@ test:
 clean:
 	pip uninstall custom_ops -y
 	python setup.py clean
+
+.PHONY: FORCE
+FORCE:

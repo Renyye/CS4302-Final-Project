@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <torch/extension.h>
 
-__global__ void custom_bmm_kernel(float *d_A, float *d_B, float *d_C, int batch_size, int M, int N, int P) {
+__global__ void bmm_kernel(float *d_A, float *d_B, float *d_C, int batch_size, int M, int N, int P) {
 	int row = blockIdx.y * blockDim.y + threadIdx.y;
 	int col = blockIdx.x * blockDim.x + threadIdx.x;
 	int batch = blockIdx.z * blockDim.z + threadIdx.z;
@@ -45,7 +45,7 @@ at::Tensor custom_bmm(at::Tensor A, at::Tensor B) {
                  (batch_size));
 
     // 调用kernel
-    custom_bmm_kernel<<<gridDim, blockDim>>>(d_A, d_B, d_C, batch_size, M, N, P);
+    bmm_kernel<<<gridDim, blockDim>>>(d_A, d_B, d_C, batch_size, M, N, P);
 
     // 同步和错误检查
     cudaDeviceSynchronize();
