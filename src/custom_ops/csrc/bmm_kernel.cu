@@ -18,7 +18,7 @@ __global__ void custom_bmm_kernel(float *d_A, float *d_B, float *d_C, int batch_
 }
 
 // 封装函数：接收PyTorch张量并调用kernel
-torch::Tensor custom_bmm(torch::Tensor A, torch::Tensor B) {
+at::Tensor custom_bmm(at::Tensor A, at::Tensor B) {
     // 假设输入为 (batch_size, M, N), (batch_size, N, P)
     TORCH_CHECK(A.is_cuda(), "A must be a CUDA tensor");
     TORCH_CHECK(B.is_cuda(), "B must be a CUDA tensor");

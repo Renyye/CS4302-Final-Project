@@ -14,7 +14,7 @@ __global__ void custom_matAdd_kernel(float *d_A, float *d_B, float *d_C, int M, 
 }
 
 // PyTorch 接口封装
-torch::Tensor custom_matAdd(torch::Tensor A, torch::Tensor B) {
+at::Tensor custom_matAdd(at::Tensor A, at::Tensor B) {
     // 检查输入是否为 GPU 张量
     if (!A.is_cuda() || !B.is_cuda()) {
         throw std::invalid_argument("输入张量必须在 GPU 上");

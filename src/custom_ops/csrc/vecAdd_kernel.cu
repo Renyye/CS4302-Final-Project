@@ -10,7 +10,7 @@ __global__ void custom_vecAdd_kernel(float *d_a, float *d_b, float *d_c, int N) 
 
 
 // 封装的 C++ 函数
-torch::Tensor custom_vecAdd(torch::Tensor A, torch::Tensor B) {
+at::Tensor custom_vecAdd(at::Tensor A, at::Tensor B) {
     // 检查输入张量是否为 CUDA 张量
     TORCH_CHECK(A.is_cuda(), "Input tensor A must be a CUDA tensor");
     TORCH_CHECK(B.is_cuda(), "Input tensor B must be a CUDA tensor");

@@ -14,7 +14,7 @@ __global__ void custom_transpose_kernel(float *d_A, float *d_T, int M, int N) {
 }
 
 // PyTorch 接口封装
-torch::Tensor custom_transpose(torch::Tensor A) {
+at::Tensor custom_transpose(at::Tensor A) {
     // 检查输入是否为 GPU 张量
     if (!A.is_cuda()) {
         throw std::invalid_argument("输入张量必须在 GPU 上");

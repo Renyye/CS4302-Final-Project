@@ -18,7 +18,7 @@ __global__ void custom_matMul_kernel(float *d_A, float *d_B, float *d_C, int M, 
 
 
 // 定义 PyTorch 接口
-torch::Tensor custom_matMul(torch::Tensor A, torch::Tensor B) {
+at::Tensor custom_matMul(at::Tensor A, at::Tensor B) {
     // 检查输入是否为 GPU 张量
     if (!A.is_cuda() || !B.is_cuda()) {
         throw std::invalid_argument("A 和 B 必须在 GPU 上");

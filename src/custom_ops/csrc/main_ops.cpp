@@ -3,11 +3,11 @@
 #include <torch/extension.h>
 
 // 声明在其他cpp文件中定义的函数
-torch::Tensor custom_bmm(torch::Tensor A, torch::Tensor B);
-torch::Tensor custom_vecAdd(torch::Tensor A, torch::Tensor B);
-torch::Tensor custom_matMul(torch::Tensor A, torch::Tensor B);
-torch::Tensor custom_transpose(torch::Tensor A);
-torch::Tensor custom_matAdd(torch::Tensor A, torch::Tensor B);
+at::Tensor custom_bmm(at::Tensor A, at::Tensor B);
+at::Tensor custom_vecAdd(at::Tensor A, at::Tensor B);
+at::Tensor custom_matMul(at::Tensor A, at::Tensor B);
+at::Tensor custom_transpose(at::Tensor A);
+at::Tensor custom_matAdd(at::Tensor A, at::Tensor B);
 
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
     m.def("custom_bmm_cuda", &custom_bmm, "Batched Matrix Multiplication");
