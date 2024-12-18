@@ -4,11 +4,14 @@ build: FORCE
 	python setup.py install
 
 test:
-	python test.py
+	python scripts/test.py
 
 clean:
 	pip uninstall custom_ops -y
 	python setup.py clean
+
+benchmark:
+	python scripts/benchmark.py
 
 .PHONY: FORCE
 FORCE:
