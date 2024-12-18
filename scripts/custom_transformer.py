@@ -43,7 +43,7 @@ class CustomTransformerLayer(nn.Module):
         K = custom_ops.custom_transpose_cuda(K)  # [B, E, S]
         attn_scores = custom_ops.custom_bmm_cuda(Q, K)  # [B, S, S]
 
-        attn_weights = torch.softmax(attn_scores, dim=2)
+        attn_weights = custom_ops.custom_softmax_cuda(attn_scores, 2)
 
         # Attention输出
         attn_output = custom_ops.custom_bmm_cuda(attn_weights, V)  # [B, S, E]
