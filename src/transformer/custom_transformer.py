@@ -30,20 +30,23 @@ class CustomLinear(nn.Module):
         B, S, E_in = input.size()
         assert E_in == self.in_features, f"输入特征维度不匹配: expected {self.in_features}, got {E_in}"
 
+        weight = self.weight
+
         # 将 weight 从 [in_features, out_features] 转换为 [B, in_features, out_features]
-        # 以适应 custom_bmm_bias_cuda 的输入要求
-        weight_batched = self.weight.unsqueeze(0).expand(B, -1, -1)  # [B, in_features, out_features]
-        # 处理 bias
+        # 以适应 custom_bmm_cuda 的输入要求
+        # 使用 expand 而不是 clone 来避免不必要的内存复制
+
         if self.bias is not None:
             bias = self.bias
         else:
-            # 如果没有偏置，使用零偏置
             bias = torch.zeros(self.out_features, device=input.device, dtype=input.dtype)
 
-        weight_batched = weight_batched.clone().cuda()
-        bmm_result = custom_ops.custom_bmm_cuda(input, weight_batched)  # [B, S, out_features]
-        output = bmm_result + bias # [B, S, out_features]
-        # assert torch.allclose(output,torch.bmm(input, weight_batched)+bias)
+        # 执行自定义的批处理矩阵乘法
+        output = custom_ops.shared_weight_bmm_cuda(input, weight) + bias
+        # weight_batched = weight.unsqueeze(0).expand(B, -1, -1)  # [B, in_features, out_features]
+        # 如果需要，可以添加断言来验证结果
+        # assert torch.allclose(output, torch.bmm(input, weight_batched) + bias, atol=1e-5)
+
         return output
 
 
