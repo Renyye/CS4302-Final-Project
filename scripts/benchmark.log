@@ -1,0 +1,15 @@
+2024-12-19 07:49:05,568 - INFO - Parameters: num_layers=6, embed_dim=256, num_heads=16, dim_feedforward=512, dropout=0.2, batch_size=16, seq_length=40
+2024-12-19 07:49:05,569 - INFO - Custom Transformer Time: 26.8170 seconds
+2024-12-19 07:49:05,569 - INFO - Native Transformer Time: 5.0875 seconds
+2024-12-19 07:49:05,569 - INFO - Similarity: True
+2024-12-19 07:49:05,569 - INFO - Percentage Difference: 0.0000
+2024-12-19 07:51:42,518 - INFO - Parameters: num_layers=6, embed_dim=256, num_heads=16, dim_feedforward=512, dropout=0.2, batch_size=16, seq_length=40
+2024-12-19 07:51:42,518 - INFO - Custom Transformer Time: 26.9253 seconds
+2024-12-19 07:51:42,518 - INFO - Native Transformer Time: 5.1155 seconds
+2024-12-19 07:51:42,518 - INFO - Similarity: True
+2024-12-19 07:51:42,518 - INFO - Percentage Difference: 0.0000
+2024-12-19 07:56:44,948 - INFO - Parameters: num_layers=6, embed_dim=256, num_heads=16, dim_feedforward=512, dropout=0.2, batch_size=16, seq_length=40
+2024-12-19 07:56:44,948 - INFO - Custom Transformer Time: 27.8206 seconds
+2024-12-19 07:56:44,948 - INFO - Native Transformer Time: 6.5019 seconds
+2024-12-19 07:56:44,948 - INFO - Similarity: True
+2024-12-19 07:56:44,948 - INFO - Percentage Difference: 0.0000
