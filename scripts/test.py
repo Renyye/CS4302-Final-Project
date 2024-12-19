@@ -49,9 +49,9 @@ for _ in range(1000):
     try:
         assert (torch.allclose(C, A + B)) # 查看是否与A + B结果一致
     except:
-        save_tensor_to_file(A, "test.txt", "A")
-        save_tensor_to_file(B, "test.txt", "B")
-        save_tensor_to_file(C, "test.txt", "C")
+        # save_tensor_to_file(A, "test.txt", "A")
+        # save_tensor_to_file(B, "test.txt", "B")
+        # save_tensor_to_file(C, "test.txt", "C")
         raise Exception
 
     # 调用matmul算子
@@ -61,10 +61,10 @@ for _ in range(1000):
     try:
         assert (torch.allclose(C, torch.matmul(A, B)))# 查看是否与torch.matmul结果一致
     except: # 存在有误差的情况，误差不大暂时不管
-        save_tensor_to_file(A, "test.txt", "A")
-        save_tensor_to_file(B, "test.txt", "B")
-        save_tensor_to_file(C, "test.txt", "C")
-        save_tensor_to_file(torch.matmul(A, B), "test.txt", "expected_C")
+        # save_tensor_to_file(A, "test.txt", "A")
+        # save_tensor_to_file(B, "test.txt", "B")
+        # save_tensor_to_file(C, "test.txt", "C")
+        # save_tensor_to_file(torch.matmul(A, B), "test.txt", "expected_C")
         raise Exception
 
     # 调用transpose算子
@@ -73,9 +73,9 @@ for _ in range(1000):
     try:
         assert (torch.allclose(C, A.transpose(1, 2))) # 查看是否与A.transpose(1, 2)结果一致
     except:
-        save_tensor_to_file(A, "test.txt", "A")
-        save_tensor_to_file(B, "test.txt", "B")
-        save_tensor_to_file(C, "test.txt", "C")
+        # save_tensor_to_file(A, "test.txt", "A")
+        # save_tensor_to_file(B, "test.txt", "B")
+        # save_tensor_to_file(C, "test.txt", "C")
         raise Exception
 
     # 调用matAdd算子
@@ -85,9 +85,9 @@ for _ in range(1000):
     try:
         assert (torch.allclose(C, A + B)) # 查看是否与A + B结果一致
     except:
-        save_tensor_to_file(A, "test.txt", "A")
-        save_tensor_to_file(B, "test.txt", "B")
-        save_tensor_to_file(C, "test.txt", "C")
+        # save_tensor_to_file(A, "test.txt", "A")
+        # save_tensor_to_file(B, "test.txt", "B")
+        # save_tensor_to_file(C, "test.txt", "C")
         raise Exception
 
     # # 调用layerNormat::Tensor custom_layerNorm_cuda(at::Tensor input, at::Tensor gamma, at::Tensor beta, int normalized_shape);
@@ -108,7 +108,7 @@ for _ in range(1000):
     try:
         assert (torch.allclose(C, torch.softmax(A, 2))) # 查看是否与torch.softmax结果一致
     except:
-        save_tensor_to_file(A, "test.txt", "A")
-        save_tensor_to_file(B, "test.txt", "B")
-        save_tensor_to_file(C, "test.txt", "C")
+        # save_tensor_to_file(A, "test.txt", "A")
+        # save_tensor_to_file(B, "test.txt", "B")
+        # save_tensor_to_file(C, "test.txt", "C")
         raise Exception
