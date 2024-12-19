@@ -1,16 +1,20 @@
 import torch
 import time
 from custom_transformer import CustomTransformer
-from native_ref import NativeTransformer
+from baseline_transformer import NativeTransformer
+
+import logging
+
+
 
 # 设置参数
-num_layers = 4
-embed_dim = 128
-num_heads = 8
-dim_feedforward = 256
-dropout = 0.1
-batch_size = 8
-seq_length = 20
+num_layers = 6
+embed_dim = 256
+num_heads = 16
+dim_feedforward = 512
+dropout = 0.2
+batch_size = 16
+seq_length = 40
 
 # num_layers = 2
 # embed_dim = 1
@@ -39,7 +43,7 @@ for _ in range(10):
 
 # 测量 Custom Transformer
 start = time.time()
-for _ in range(1000):
+for _ in range(2000):
     output_custom = custom_transformer(src1)
 torch.cuda.synchronize()
 end = time.time()
@@ -59,7 +63,7 @@ for _ in range(10):
 
 # 测量 Native Transformer
 start = time.time()
-for _ in range(1000):
+for _ in range(2000):
     output_native = native_transformer(src2)
 torch.cuda.synchronize()
 end = time.time()
@@ -75,3 +79,20 @@ percentage = (torch.abs(output_custom - output_native) / output_custom).mean().i
 
 print(f"Similarity: {similarity}")
 print(f"Percentage Difference: {percentage:.4f}")
+
+
+logging.basicConfig(
+    filename='scripts/benchmark.log',
+    filemode='a',
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
+
+# 记录到日志文件
+logging.info(f"Parameters: num_layers={num_layers}, embed_dim={embed_dim}, num_heads={num_heads}, "
+                f"dim_feedforward={dim_feedforward}, dropout={dropout}, batch_size={batch_size}, "
+                f"seq_length={seq_length}")
+logging.info(f"Custom Transformer Time: {custom_time:.4f} seconds")
+logging.info(f"Native Transformer Time: {native_time:.4f} seconds")
+logging.info(f"Similarity: {similarity}")
+logging.info(f"Percentage Difference: {percentage:.4f}")
