@@ -5,26 +5,13 @@ __global__ void bmm_kernel(float *d_A, float *d_B, float *d_C, int batch_size, i
     int row = blockIdx.y * blockDim.y + threadIdx.y;
     int col = blockIdx.x * blockDim.x + threadIdx.x;
     int batch = blockIdx.z * blockDim.z + threadIdx.z;
-    // printf d_B
-    if (batch < batch_size && row < M && col < P) {
-        printf("Batch: %d, Row: %d, Col: %d, A[Batch=%d][Row=%d][i=%d]=%f, B[Batch=%d][i=%d][Col=%d]=%f\n",
-                batch, row, col,
-                batch, row, 0, d_A[batch * M * N + row * N + 0],
-                batch, 0, col, d_B[batch * N * P + 0 * P + col]);
-    }
     if (batch < batch_size && row < M && col < P) {
         float sum = 0.0f;
         
                 for (int i = 0; i < N; ++i) {
                         sum += d_A[batch * M * N + row * N + i] * d_B[batch * N * P + i * P + col];
-                        printf("Batch: %d, Row: %d, Col: %d, i: %d, A[Batch=%d][Row=%d][i=%d]=%f, B[Batch=%d][i=%d][Col=%d]=%f, Partial Sum: %f\n",
-                                batch, row, col, i,
-                                batch, row, i, d_A[batch * M * N + row * N + i],
-                                batch, i, col, d_B[batch * N * P + i * P + col],
-                                sum);
                 }
         d_C[batch * M * P + row * P + col] = sum;
-                printf("Batch: %d, Row: %d, Col: %d, Sum: %f\n", batch, row, col, sum);
     }
 }
 
@@ -53,7 +40,6 @@ at::Tensor custom_bmm(at::Tensor A, at::Tensor B) {
     dim3 gridDim((P + blockDim.x - 1)/blockDim.x,
                 (M + blockDim.y - 1)/blockDim.y,
                 batch_size);
-
 
     // 调用kernel
     bmm_kernel<<<gridDim, blockDim>>>(d_A, d_B, d_C, batch_size, M, N, P);

@@ -4,21 +4,21 @@ from custom_transformer import CustomTransformer
 from native_ref import NativeTransformer
 
 # 设置参数
+num_layers = 4
+embed_dim = 128
+num_heads = 8
+dim_feedforward = 256
+dropout = 0.1
+batch_size = 8
+seq_length = 20
+
 # num_layers = 2
-# embed_dim = 64
+# embed_dim = 1
 # num_heads = 4
 # dim_feedforward = 128
-# dropout = 0.1
+# dropout = 0
 # batch_size = 4
-# seq_length = 10
-
-num_layers = 2
-embed_dim = 1
-num_heads = 4
-dim_feedforward = 128
-dropout = 0
-batch_size = 4
-seq_length = 2
+# seq_length = 2
 
 src = torch.randn(seq_length, batch_size, embed_dim, device='cuda')
 src1 = src.clone()
@@ -34,12 +34,12 @@ torch.backends.cudnn.benchmark = False  # 禁用 cudnn 加速，这对于小规�
 custom_transformer = CustomTransformer(num_layers, embed_dim, num_heads, dim_feedforward, dropout).cuda()
 
 # 预热：确保模型已经加载并且GPU已被占用
-# for _ in range(10):
-#     _ = custom_transformer(src)
+for _ in range(10):
+    _ = custom_transformer(src)
 
 # 测量 Custom Transformer
 start = time.time()
-for _ in range(1):
+for _ in range(1000):
     output_custom = custom_transformer(src1)
 torch.cuda.synchronize()
 end = time.time()
@@ -54,12 +54,12 @@ torch.backends.cudnn.deterministic = True  # 确保结果是确定性的
 torch.backends.cudnn.benchmark = False 
 native_transformer = NativeTransformer(num_layers, embed_dim, num_heads, dim_feedforward, dropout).cuda()
 
-# for _ in range(10):
-#     _ = native_transformer(src)
+for _ in range(10):
+    _ = native_transformer(src)
 
 # 测量 Native Transformer
 start = time.time()
-for _ in range(1):
+for _ in range(1000):
     output_native = native_transformer(src2)
 torch.cuda.synchronize()
 end = time.time()

@@ -3,14 +3,7 @@ import torch
 import torch.nn as nn
 import torch.nn.init as init
 import custom_ops  # 确保包含 custom_baddmm_cuda
-
-def save_tensor_to_file(tensor, filename, name):
-    # 保存张量的形状和数据到文件
-    with open(filename, 'a') as f:
-        f.write(f"Shape: {tensor.shape}, type: {type(tensor)} \n")
-        f.write(f"Name: {name}, dtype: {tensor.dtype}\n")
-        f.write(f"Data: {tensor.cpu().detach().numpy()}\n")
-        f.write("\n" + "="*50 + "\n")
+# from utils import save_tensor_to_file
 
 
 class CustomLinear(nn.Module):
@@ -40,7 +33,6 @@ class CustomLinear(nn.Module):
         # 将 weight 从 [in_features, out_features] 转换为 [B, in_features, out_features]
         # 以适应 custom_bmm_bias_cuda 的输入要求
         weight_batched = self.weight.unsqueeze(0).expand(B, -1, -1)  # [B, in_features, out_features]
-        save_tensor_to_file(self.weight, "LinearLog.txt", "weight")
         # 处理 bias
         if self.bias is not None:
             bias = self.bias
@@ -48,23 +40,10 @@ class CustomLinear(nn.Module):
             # 如果没有偏置，使用零偏置
             bias = torch.zeros(self.out_features, device=input.device, dtype=input.dtype)
 
-
-        save_tensor_to_file(input, "LinearLog.txt", "input")
-        save_tensor_to_file(weight_batched, "LinearLog.txt", "weight_batched")
-        # save_tensor_to_file(bias, "LinearLog.txt", "bias")
-
-        # 调用 custom_bmm_bias_cuda
-        # assert torch.allclose(custom_ops.custom_bmm_cuda(input, weight_batched),
-        #                       torch.bmm(input, weight_batched))
         weight_batched = weight_batched.clone().cuda()
         bmm_result = custom_ops.custom_bmm_cuda(input, weight_batched)  # [B, S, out_features]
         output = bmm_result + bias # [B, S, out_features]
-        save_tensor_to_file(input, "LinearLog.txt", "inputafter")
-        save_tensor_to_file(weight_batched, "LinearLog.txt", "weight_batchedafter")
-        save_tensor_to_file(bmm_result, "LinearLog.txt", "bmm_result")
-        save_tensor_to_file(output, "LinearLog.txt", "output")
-        save_tensor_to_file(torch.bmm(input, weight_batched), "LinearLog.txt", "torch_bmm")
-        assert torch.allclose(output,torch.bmm(input, weight_batched)+bias)
+        # assert torch.allclose(output,torch.bmm(input, weight_batched)+bias)
         return output
 
 
@@ -98,10 +77,6 @@ class CustomTransformerLayer(nn.Module):
         Q = self.q_linear(src)  # [B, S, E]
         K = self.k_linear(src)
         V = self.v_linear(src)
-        save_tensor_to_file(src, "output1.txt", "src")
-        save_tensor_to_file(Q, "output1.txt", "Q")
-        save_tensor_to_file(K, "output1.txt", "K")
-        save_tensor_to_file(V, "output1.txt", "V")
 
         K = custom_ops.custom_transpose_cuda(K)  # [B, E, S]
         attn_scores = custom_ops.custom_bmm_cuda(Q, K)  # [B, S, S]

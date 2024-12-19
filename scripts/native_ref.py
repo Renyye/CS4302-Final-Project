@@ -1,15 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.init as init
-
-def save_tensor_to_file(tensor, filename, name):
-    # 保存张量的形状和数据到文件
-    with open(filename, 'a') as f:
-        f.write(f"Shape: {tensor.shape}\n")
-        f.write(f"Name: {name}\n")
-        f.write(f"Data: {tensor.cpu().detach().numpy()}\n")
-        f.write("\n" + "="*50 + "\n")
-
+# from utils import save_tensor_to_file
 
 class NativeTransformerLayer(nn.Module):
     def __init__(self, embed_dim, num_heads, dim_feedforward, dropout=0.1):
@@ -35,7 +27,7 @@ class NativeTransformerLayer(nn.Module):
         # Dropout 层
         self.dropout = nn.Dropout(dropout)
         self.activation = nn.ReLU()  # 或者使用 nn.GELU()
-        # 自定义初始化（全部初始化为0）
+        # 自定义初始化
         self._initialize_weights()
 
     def _initialize_weights(self):
@@ -48,10 +40,6 @@ class NativeTransformerLayer(nn.Module):
         Q = self.q_linear(src)  # [B, S, E]
         K = self.k_linear(src)
         V = self.v_linear(src)
-        save_tensor_to_file(src, "output2.txt", "src")
-        save_tensor_to_file(Q, "output2.txt", "Q")
-        save_tensor_to_file(K, "output2.txt", "K")
-        save_tensor_to_file(V, "output2.txt", "V")
 
         # 转置 K 以匹配矩阵乘法的维度
         K_transposed = K.transpose(1, 2)  # [B, E, S]

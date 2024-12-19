@@ -12,9 +12,9 @@ clean:
 	python setup.py clean
 
 benchmark:
-	rm -f output1.txt output2.txt LinearLog.txt
+	# rm -f output1.txt output2.txt LinearLog.txt
 	python scripts/benchmark.py
-	diff output1.txt output2.txt
+	# diff output1.txt output2.txt
 
 count:
 	python /home/wrt/code/pytorch/tools/kernel_count/kernel_count.py scripts/benchmark.py
