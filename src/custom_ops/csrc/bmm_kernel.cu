@@ -1,116 +1,67 @@
+#include <stdlib.h>
 #include <torch/extension.h>
-#include <cuda.h>
-#include <cuda_runtime.h>
 
-#define TILE_SIZE 4  // 定义子块大小
-
-template <typename scalar_t>
-__global__ void bmm_kernel(const scalar_t *d_A, const scalar_t *d_B, scalar_t *d_C, int batch_size, int M, int N, int P) {
-    // 计算当前线程所属的批次、行和列
-    int batch = blockIdx.z;
-    int row = blockIdx.y * TILE_SIZE + threadIdx.y;
-    int col = blockIdx.x * TILE_SIZE + threadIdx.x;
-
-    // 如果是小矩阵 (1x1)，直接执行简单的乘法
-    if (M == 1 && N == 1 && P == 1) {
-        if (batch < batch_size && row == 0 && col == 0) {
-            d_C[batch] = d_A[batch] * d_B[batch];  // 直接进行乘法
-        }
-        return;
-    }
-
-    // 定义共享内存子块
-    __shared__ scalar_t As[TILE_SIZE][TILE_SIZE];
-    __shared__ scalar_t Bs[TILE_SIZE][TILE_SIZE];
-
-    scalar_t value = 0.0;
-
-    // 计算需要的子块数量
-    int num_tiles = (N + TILE_SIZE - 1) / TILE_SIZE;
-
-    for (int tile = 0; tile < num_tiles; ++tile) {
-        // 加载A的子块到共享内存
-        if (row < M && (tile * TILE_SIZE + threadIdx.x) < N) {
-            As[threadIdx.y][threadIdx.x] = d_A[batch * M * N + row * N + tile * TILE_SIZE + threadIdx.x];
-        } else {
-            As[threadIdx.y][threadIdx.x] = 0.0;
-        }
-
-        // 加载B的子块到共享内存
-        if (col < P && (tile * TILE_SIZE + threadIdx.y) < N) {
-            Bs[threadIdx.y][threadIdx.x] = d_B[batch * N * P + (tile * TILE_SIZE + threadIdx.y) * P + col];
-        } else {
-            Bs[threadIdx.y][threadIdx.x] = 0.0;
-        }
-
-        __syncthreads();  // 等待所有线程加载完成
-
-        // 计算子块的乘积
-        for (int k = 0; k < TILE_SIZE; ++k) {
-            value += As[threadIdx.y][k] * Bs[k][threadIdx.x];
-        }
-
-        __syncthreads();  // 等待所有线程完成计算
-    }
-
-    // 写入结果到全局内存
+__global__ void bmm_kernel(float *d_A, float *d_B, float *d_C, int batch_size, int M, int N, int P) {
+    int row = blockIdx.y * blockDim.y + threadIdx.y;
+    int col = blockIdx.x * blockDim.x + threadIdx.x;
+    int batch = blockIdx.z * blockDim.z + threadIdx.z;
+    // printf d_B
     if (batch < batch_size && row < M && col < P) {
-        d_C[batch * M * P + row * P + col] = value;
+        printf("Batch: %d, Row: %d, Col: %d, A[Batch=%d][Row=%d][i=%d]=%f, B[Batch=%d][i=%d][Col=%d]=%f\n",
+                batch, row, col,
+                batch, row, 0, d_A[batch * M * N + row * N + 0],
+                batch, 0, col, d_B[batch * N * P + 0 * P + col]);
+    }
+    if (batch < batch_size && row < M && col < P) {
+        float sum = 0.0f;
+        
+                for (int i = 0; i < N; ++i) {
+                        sum += d_A[batch * M * N + row * N + i] * d_B[batch * N * P + i * P + col];
+                        printf("Batch: %d, Row: %d, Col: %d, i: %d, A[Batch=%d][Row=%d][i=%d]=%f, B[Batch=%d][i=%d][Col=%d]=%f, Partial Sum: %f\n",
+                                batch, row, col, i,
+                                batch, row, i, d_A[batch * M * N + row * N + i],
+                                batch, i, col, d_B[batch * N * P + i * P + col],
+                                sum);
+                }
+        d_C[batch * M * P + row * P + col] = sum;
+                printf("Batch: %d, Row: %d, Col: %d, Sum: %f\n", batch, row, col, sum);
     }
 }
 
-
-// Host function that wraps the CUDA kernel
+// 封装函数：接收PyTorch张量并调用kernel
 at::Tensor custom_bmm(at::Tensor A, at::Tensor B) {
-    // 检查输入张量属性
+    // 假设输入为 (batch_size, M, N), (batch_size, N, P)
     TORCH_CHECK(A.is_cuda(), "A must be a CUDA tensor");
     TORCH_CHECK(B.is_cuda(), "B must be a CUDA tensor");
+    TORCH_CHECK(A.dtype() == torch::kFloat32, "A must be float32");
+    TORCH_CHECK(B.dtype() == torch::kFloat32, "B must be float32");
 
-    // 获取数据类型
-    auto dtype = A.dtype();
+    int batch_size = A.size(0);
+    int M = A.size(1);
+    int N = A.size(2);
+    int P = B.size(2);
 
-    // 根据数据类型选择不同的模板
-    if (dtype == torch::kFloat32) {
-        // 对应float32
-        const float* d_A = A.data_ptr<float>();
-        const float* d_B = B.data_ptr<float>();
-        float* d_C = A.new_zeros({A.size(0), A.size(1), B.size(2)}, torch::dtype(torch::kFloat32)).data_ptr<float>();
-        
-        // 定义 block 和 grid 的维度
-        dim3 blockDim(TILE_SIZE, TILE_SIZE, 1);
-        dim3 gridDim((B.size(2) + TILE_SIZE - 1) / TILE_SIZE,
-                     (A.size(1) + TILE_SIZE - 1) / TILE_SIZE,
-                     A.size(0));
+    // 创建输出tensor (batch_size, M, P)
+    auto C = torch::zeros({batch_size, M, P}, torch::dtype(torch::kFloat32).device(A.device()));
 
-        // 调用 kernel
-        bmm_kernel<float><<<gridDim, blockDim>>>(d_A, d_B, d_C, A.size(0), A.size(1), A.size(2), B.size(2));
+    // 获取raw pointers
+    float *d_A = A.data_ptr<float>();
+    float *d_B = B.data_ptr<float>();
+    float *d_C = C.data_ptr<float>();
 
-        // 同步和错误检查
-        cudaError_t err = cudaDeviceSynchronize();
-        TORCH_CHECK(err == cudaSuccess, "CUDA Error: ", cudaGetErrorString(err));
+    dim3 blockDim(16, 16, 1);
+    dim3 gridDim((P + blockDim.x - 1)/blockDim.x,
+                (M + blockDim.y - 1)/blockDim.y,
+                batch_size);
 
-        return torch::from_blob(d_C, {A.size(0), A.size(1), B.size(2)}, torch::dtype(torch::kFloat32).device(A.device()));  // 正确
-    } else if (dtype == torch::kFloat64) {
-        // 对应float64
-        const double* d_A = A.data_ptr<double>();
-        const double* d_B = B.data_ptr<double>();
-        double* d_C = A.new_zeros({A.size(0), A.size(1), B.size(2)}, torch::dtype(torch::kFloat64)).data_ptr<double>();
 
-        // 定义 block 和 grid 的维度
-        dim3 blockDim(TILE_SIZE, TILE_SIZE, 1);
-        dim3 gridDim((B.size(2) + TILE_SIZE - 1) / TILE_SIZE,
-                     (A.size(1) + TILE_SIZE - 1) / TILE_SIZE,
-                     A.size(0));
+    // 调用kernel
+    bmm_kernel<<<gridDim, blockDim>>>(d_A, d_B, d_C, batch_size, M, N, P);
 
-        // 调用 kernel
-        bmm_kernel<double><<<gridDim, blockDim>>>(d_A, d_B, d_C, A.size(0), A.size(1), A.size(2), B.size(2));
+    // 同步和错误检查
+    cudaDeviceSynchronize();
+    auto err = cudaGetLastError();
+    TORCH_CHECK(err == cudaSuccess, "CUDA Error: ", cudaGetErrorString(err));
 
-        // 同步和错误检查
-        cudaError_t err = cudaDeviceSynchronize();
-        TORCH_CHECK(err == cudaSuccess, "CUDA Error: ", cudaGetErrorString(err));
-
-        return torch::from_blob(d_C, {A.size(0), A.size(1), B.size(2)}, torch::dtype(torch::kFloat32).device(A.device()));  // 正确
-    } else {
-        TORCH_CHECK(false, "Unsupported dtype");
-    }
+    return C;
 }

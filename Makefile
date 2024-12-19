@@ -12,7 +12,7 @@ clean:
 	python setup.py clean
 
 benchmark:
-	rm -f output1.txt output2.txt output3.txt
+	rm -f output1.txt output2.txt LinearLog.txt
 	python scripts/benchmark.py
 	diff output1.txt output2.txt
 

@@ -16,7 +16,7 @@ num_layers = 2
 embed_dim = 1
 num_heads = 4
 dim_feedforward = 128
-dropout = 0.1
+dropout = 0
 batch_size = 4
 seq_length = 2
 
