@@ -34,7 +34,7 @@ class CustomLinear(nn.Module):
         x_2d = input.reshape(B * S, E_in)  # [B*S, in_features]
 
         # (2) 调用 PyTorch 的矩阵乘法
-        out_2d = torch.matmul(x_2d, self.weight)  # [B*S, out_features]
+        out_2d = custom_ops.custom_matmul_cuda(x_2d, self.weight)  # [B*S, out_features]
 
         # (3) 若有 bias，则加到结果上（会对最后一维做广播）
         if self.bias is not None:

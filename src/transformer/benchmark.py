@@ -48,6 +48,7 @@ for _ in range(2000):
 torch.cuda.synchronize()
 end = time.time()
 custom_time = end - start
+print(f"Custom Transformer Time: {custom_time:.4f} seconds")
 
 # 重新设置随机种子
 seed = 1234
@@ -70,7 +71,6 @@ end = time.time()
 native_time = end - start
 
 # 打印时间比较
-print(f"Custom Transformer Time: {custom_time:.4f} seconds")
 print(f"Native Transformer Time: {native_time:.4f} seconds")
 
 # 验证输出相似性
