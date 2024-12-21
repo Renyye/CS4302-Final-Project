@@ -14,7 +14,7 @@
 ## Todo
 - [ ] 优化算子
     - [x] bmm 现在使用了tiling
-    - [ ] 类似矩阵乘法，还可以有更多优化
+    - [ ] 类似矩阵乘法，还可以有更多优化:  shared_weight_bmm aborted. Use mm instead.
     - [ ] custom_transpose_cuda
     - [ ] custom_softmax_cuda
     - [ ] custom_vecAdd_cuda?

@@ -30,22 +30,18 @@ class CustomLinear(nn.Module):
         B, S, E_in = input.size()
         assert E_in == self.in_features, f"输入特征维度不匹配: expected {self.in_features}, got {E_in}"
 
-        weight = self.weight
+        # (1) 合并 [B, S] -> [B*S]
+        x_2d = input.reshape(B * S, E_in)  # [B*S, in_features]
 
-        # 将 weight 从 [in_features, out_features] 转换为 [B, in_features, out_features]
-        # 以适应 custom_bmm_cuda 的输入要求
-        # 使用 expand 而不是 clone 来避免不必要的内存复制
+        # (2) 调用 PyTorch 的矩阵乘法
+        out_2d = torch.matmul(x_2d, self.weight)  # [B*S, out_features]
 
+        # (3) 若有 bias，则加到结果上（会对最后一维做广播）
         if self.bias is not None:
-            bias = self.bias
-        else:
-            bias = torch.zeros(self.out_features, device=input.device, dtype=input.dtype)
+            out_2d += self.bias
 
-        # 执行自定义的批处理矩阵乘法
-        output = custom_ops.shared_weight_bmm_cuda(input, weight) + bias
-        # weight_batched = weight.unsqueeze(0).expand(B, -1, -1)  # [B, in_features, out_features]
-        # 如果需要，可以添加断言来验证结果
-        # assert torch.allclose(output, torch.bmm(input, weight_batched) + bias, atol=1e-5)
+        # (4) 恢复 [B, S, out_features]
+        output = out_2d.reshape(B, S, self.out_features)
 
         return output
 
