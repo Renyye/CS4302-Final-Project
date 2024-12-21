@@ -44,3 +44,28 @@
 2024-12-21 14:42:49,879 - INFO - Native Transformer Time: 5.1831 seconds
 2024-12-21 14:42:49,879 - INFO - Similarity: True
 2024-12-21 14:42:49,879 - INFO - Percentage Difference: 0.0000
+2024-12-21 17:18:46,275 - INFO - Parameters: num_layers=6, embed_dim=256, num_heads=16, dim_feedforward=512, dropout=0.2, batch_size=16, seq_length=40
+2024-12-21 17:18:46,275 - INFO - Custom Transformer Time: 25.4191 seconds
+2024-12-21 17:18:46,275 - INFO - Native Transformer Time: 6.5051 seconds
+2024-12-21 17:18:46,275 - INFO - Similarity: True
+2024-12-21 17:18:46,275 - INFO - Percentage Difference: 0.0000
+2024-12-21 17:19:45,128 - INFO - Parameters: num_layers=6, embed_dim=256, num_heads=16, dim_feedforward=512, dropout=0.2, batch_size=16, seq_length=40
+2024-12-21 17:19:45,128 - INFO - Custom Transformer Time: 7.1136 seconds
+2024-12-21 17:19:45,128 - INFO - Native Transformer Time: 6.5098 seconds
+2024-12-21 17:19:45,128 - INFO - Similarity: True
+2024-12-21 17:19:45,128 - INFO - Percentage Difference: 0.0000
+2024-12-21 17:25:19,713 - INFO - Parameters: num_layers=6, embed_dim=256, num_heads=16, dim_feedforward=512, dropout=0.2, batch_size=16, seq_length=40
+2024-12-21 17:25:19,713 - INFO - Custom Transformer Time: 43.3071 seconds
+2024-12-21 17:25:19,713 - INFO - Native Transformer Time: 5.2715 seconds
+2024-12-21 17:25:19,713 - INFO - Similarity: True
+2024-12-21 17:25:19,713 - INFO - Percentage Difference: 0.0000
+2024-12-21 17:26:19,303 - INFO - Parameters: num_layers=6, embed_dim=256, num_heads=16, dim_feedforward=512, dropout=0.2, batch_size=16, seq_length=40
+2024-12-21 17:26:19,304 - INFO - Custom Transformer Time: 43.3062 seconds
+2024-12-21 17:26:19,304 - INFO - Native Transformer Time: 5.1701 seconds
+2024-12-21 17:26:19,304 - INFO - Similarity: True
+2024-12-21 17:26:19,304 - INFO - Percentage Difference: 0.0000
+2024-12-21 17:37:26,020 - INFO - Parameters: num_layers=6, embed_dim=256, num_heads=16, dim_feedforward=512, dropout=0.2, batch_size=16, seq_length=40
+2024-12-21 17:37:26,020 - INFO - Custom Transformer Time: 8.6399 seconds
+2024-12-21 17:37:26,020 - INFO - Native Transformer Time: 5.1199 seconds
+2024-12-21 17:37:26,020 - INFO - Similarity: True
+2024-12-21 17:37:26,020 - INFO - Percentage Difference: 0.0000
