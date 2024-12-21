@@ -15,7 +15,10 @@
 - [ ] 优化算子
     - [x] bmm 现在使用了tiling
     - [ ] 类似矩阵乘法，还可以有更多优化
-    - [ ] 剩余很多算子都还没优化...
+    - [ ] custom_transpose_cuda
+    - [ ] custom_softmax_cuda
+    - [ ] custom_vecAdd_cuda?
 - [ ] 扩展算子
     - [x] Self-Attention 部分使用 bmm
-    - [ ] linear 层不需要 bmm，实现一个更好的算子
+    - [x] linear 层不需要 bmm，实现一个更好的算子
+    - [ ] LayerNorm 可以换成自己实现

@@ -5,7 +5,10 @@ build: FORCE
 
 test:
 	rm -f test.txt
-	python scripts/test.py
+	python scripts/test_valid.py
+
+time:
+	python scripts/test_timecost.py
 
 clean:
 	pip uninstall custom_ops -y
