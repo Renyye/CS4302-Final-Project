@@ -4,8 +4,8 @@ import custom_ops
 
 for _ in range(100):
     print(f"Round {_}")
-    A = torch.randn(2,4,1, device='cuda')
-    B = torch.randn(2,1,1, device='cuda')
+    A = torch.randn(3,4,6, device='cuda')
+    B = torch.randn(3,6,3, device='cuda')
     C = custom_ops.custom_bmm_cuda(A, B)
     expected_C = torch.bmm(A, B)
     try:
@@ -18,36 +18,15 @@ for _ in range(100):
         raise Exception
 
 
-for _ in range(3):
-    print(f"Round {_}")
-    for batch_size in range(50,60):
-        for m in range(50,60):  # 维度m
-            for n in range(50,60):  # 维度n
-                for k in range(50,60):  # 维度k
-                    A = torch.randn(batch_size, m, k, device='cuda')
-                    B = torch.randn(batch_size, k, n, device='cuda')
-                    C = custom_ops.custom_bmm_cuda(A, B)
-                    
-                    # 用torch的bmm计算参考值
-                    expected_C = torch.bmm(A, B)
-                    
-                    # 打印测试信息并断言是否一致
-                    try:
-                        assert torch.allclose(C, expected_C), f"Test failed with shapes A: {A.shape}, B: {B.shape}, C: {C.shape}"
-                    except:
-                        # save_tensor_to_file(A, "test.txt", "A")
-                        # save_tensor_to_file(B, "test.txt", "B")
-                        # save_tensor_to_file(C, "test.txt", "C")
-                        # save_tensor_to_file(expected_C, "test.txt", "expected_C")
-                        raise Exception("Fuck you")
-
 for _ in range(1000):
     print(f"Round {_}")
     A = torch.randn(3, 4, device='cuda')
     B = torch.randn(3, 4, device='cuda')
     C = custom_ops.custom_vecAdd_cuda(A, B)
+    D = custom_ops.custom_matmul_cuda(A, B)
     try:
         assert (torch.allclose(C, A + B)) # 查看是否与A + B结果一致
+        assert (torch.allclose(D, torch.matmul(A, B))) # 查看是否与torch.matmul结果一致
     except:
         # save_tensor_to_file(A, "test.txt", "A")
         # save_tensor_to_file(B, "test.txt", "B")

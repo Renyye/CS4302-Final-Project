@@ -24,3 +24,22 @@ for _ in range(1000):
 torch.cuda.synchronize()
 end = time.time()
 print(f"Native softmax Time: {end - start:.4f} seconds")
+
+# test matmul time cost
+start = time.time()
+for _ in range(1000):
+    A = torch.randn(1024, 1024, device='cuda')
+    B = torch.randn(1024, 1024, device='cuda')
+    C = custom_ops.custom_matmul_cuda(A, B)
+torch.cuda.synchronize()
+end = time.time()
+print(f"Custom matmul Time: {end - start:.4f} seconds")
+
+start = time.time()
+for _ in range(1000):
+    A = torch.randn(1024, 1024, device='cuda')
+    B = torch.randn(1024, 1024, device='cuda')
+    C = torch.matmul(A, B)
+torch.cuda.synchronize()
+end = time.time()
+print(f"Native matmul Time: {end - start:.4f} seconds")
