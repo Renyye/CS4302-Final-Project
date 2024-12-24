@@ -11,7 +11,6 @@ setup(
                 'src/custom_ops/csrc/mm_kernel.cu',
                 'src/custom_ops/csrc/bmm_kernel.cu',
                 'src/custom_ops/csrc/vecAdd_kernel.cu',
-                'src/custom_ops/csrc/matMul_kernel.cu',
                 'src/custom_ops/csrc/transpose_kernel.cu',
                 'src/custom_ops/csrc/matAdd_kernel.cu',
                 'src/custom_ops/csrc/layerNorm_kernel.cu',

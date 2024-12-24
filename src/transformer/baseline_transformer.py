@@ -32,7 +32,7 @@ class NativeTransformerLayer(nn.Module):
 
     def _initialize_weights(self):
         for name, param in self.named_parameters():
-            init.constant_(param, 0.01)
+            init.constant_(param, 1)
 
 
     def forward(self, src):
