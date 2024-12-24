@@ -30,7 +30,7 @@ start = time.time()
 for _ in range(1000):
     A = torch.randn(1024, 1024, device='cuda')
     B = torch.randn(1024, 1024, device='cuda')
-    C = custom_ops.custom_matmul_cuda(A, B)
+    C = custom_ops.custom_matMul_cuda(A, B)
 torch.cuda.synchronize()
 end = time.time()
 print(f"Custom matmul Time: {end - start:.4f} seconds")

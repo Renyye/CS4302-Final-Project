@@ -6,7 +6,6 @@
 at::Tensor custom_matrix_mul(at::Tensor A, at::Tensor B);
 at::Tensor custom_bmm(at::Tensor A, at::Tensor B);
 at::Tensor custom_vecAdd(at::Tensor A, at::Tensor B);
-at::Tensor custom_matMul(at::Tensor A, at::Tensor B);
 at::Tensor custom_transpose(at::Tensor A);
 at::Tensor custom_matAdd(at::Tensor A, at::Tensor B);
 at::Tensor custom_layerNorm_cuda(at::Tensor input, at::Tensor gamma, at::Tensor beta, int normalized_shape);
@@ -14,10 +13,9 @@ at::Tensor custom_relu_cuda(at::Tensor input);
 at::Tensor custom_softmax_cuda(at::Tensor input, int dim);
 
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
-    m.def("custom_matmul_cuda", &custom_matrix_mul, "Matrix Multiplication");
+    m.def("custom_matMul_cuda", &custom_matrix_mul, "Matrix Multiplication");
     m.def("custom_bmm_cuda", &custom_bmm, "Batched Matrix Multiplication");
     m.def("custom_vecAdd_cuda", &custom_vecAdd, "Custom Vector Addition");
-    m.def("custom_matMul_cuda", &custom_matMul, "Custom Matrix Multiplication");
     m.def("custom_transpose_cuda", &custom_transpose, "Custom Transpouse");
     m.def("custom_matAdd_cuda", &custom_matAdd, "Custom Matrix Addition");
     m.def("custom_layerNorm_cuda", &custom_layerNorm_cuda, "Custom Layer Normalization");

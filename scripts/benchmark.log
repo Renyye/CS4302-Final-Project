@@ -69,3 +69,38 @@
 2024-12-21 17:37:26,020 - INFO - Native Transformer Time: 5.1199 seconds
 2024-12-21 17:37:26,020 - INFO - Similarity: True
 2024-12-21 17:37:26,020 - INFO - Percentage Difference: 0.0000
+2024-12-24 09:55:47,684 - INFO - Parameters: num_layers=6, embed_dim=256, num_heads=16, dim_feedforward=512, dropout=0.2, batch_size=16, seq_length=40
+2024-12-24 09:55:47,684 - INFO - Custom Transformer Time: 8.8154 seconds
+2024-12-24 09:55:47,684 - INFO - Native Transformer Time: 5.1860 seconds
+2024-12-24 09:55:47,684 - INFO - Similarity: False
+2024-12-24 09:55:47,684 - INFO - Percentage Difference: 0.0000
+2024-12-24 10:06:19,657 - INFO - Parameters: num_layers=6, embed_dim=256, num_heads=16, dim_feedforward=512, dropout=0.2, batch_size=16, seq_length=40
+2024-12-24 10:06:19,657 - INFO - Custom Transformer Time: 10.2533 seconds
+2024-12-24 10:06:19,657 - INFO - Native Transformer Time: 6.6863 seconds
+2024-12-24 10:06:19,657 - INFO - Similarity: False
+2024-12-24 10:06:19,657 - INFO - Percentage Difference: 0.0002
+2024-12-24 10:07:16,707 - INFO - Parameters: num_layers=6, embed_dim=256, num_heads=16, dim_feedforward=512, dropout=0.2, batch_size=16, seq_length=40
+2024-12-24 10:07:16,707 - INFO - Custom Transformer Time: 10.0858 seconds
+2024-12-24 10:07:16,707 - INFO - Native Transformer Time: 6.7216 seconds
+2024-12-24 10:07:16,707 - INFO - Similarity: True
+2024-12-24 10:07:16,707 - INFO - Percentage Difference: 0.0000
+2024-12-24 10:26:50,150 - INFO - Parameters: num_layers=6, embed_dim=256, num_heads=16, dim_feedforward=512, dropout=0.2, batch_size=16, seq_length=40
+2024-12-24 10:26:50,150 - INFO - Custom Transformer Time: 9.3395 seconds
+2024-12-24 10:26:50,150 - INFO - Native Transformer Time: 5.4151 seconds
+2024-12-24 10:26:50,150 - INFO - Similarity: True
+2024-12-24 10:26:50,150 - INFO - Percentage Difference: 0.0000
+2024-12-24 10:34:15,098 - INFO - Parameters: num_layers=6, embed_dim=256, num_heads=16, dim_feedforward=512, dropout=0.2, batch_size=16, seq_length=40
+2024-12-24 10:34:15,099 - INFO - Custom Transformer Time: 8.9023 seconds
+2024-12-24 10:34:15,099 - INFO - Native Transformer Time: 5.5412 seconds
+2024-12-24 10:34:15,099 - INFO - Similarity: False
+2024-12-24 10:34:15,099 - INFO - Percentage Difference: 59.6896
+2024-12-24 10:38:16,710 - INFO - Parameters: num_layers=6, embed_dim=256, num_heads=16, dim_feedforward=512, dropout=0.2, batch_size=16, seq_length=40
+2024-12-24 10:38:16,710 - INFO - Custom Transformer Time: 16.3885 seconds
+2024-12-24 10:38:16,710 - INFO - Native Transformer Time: 5.5402 seconds
+2024-12-24 10:38:16,711 - INFO - Similarity: False
+2024-12-24 10:38:16,711 - INFO - Percentage Difference: 59.6899
+2024-12-24 10:41:04,633 - INFO - Parameters: num_layers=6, embed_dim=256, num_heads=16, dim_feedforward=512, dropout=0.2, batch_size=16, seq_length=40
+2024-12-24 10:41:04,633 - INFO - Custom Transformer Time: 16.3585 seconds
+2024-12-24 10:41:04,633 - INFO - Native Transformer Time: 5.4790 seconds
+2024-12-24 10:41:04,633 - INFO - Similarity: False
+2024-12-24 10:41:04,633 - INFO - Percentage Difference: 59.6899
