@@ -1,20 +1,18 @@
 build: FORCE
 	pip uninstall custom_ops -y
 	python setup.py clean
-	python setup.py install
+	python setup.py install -- -j 8
 
-test:
-	rm -f test.txt
-	python scripts/test_valid.py
 
-time:
-	python scripts/test_timecost.py
+
+benchmark_mm:
+	python scripts/benchmark_mm.py
 
 clean:
 	pip uninstall custom_ops -y
 	python setup.py clean
 
-benchmark:
+benchmark_trans:
 	python src/transformer/benchmark.py
 
 benchmark_log:

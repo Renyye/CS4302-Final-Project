@@ -1,5 +1,4 @@
 
-
 def save_tensor_to_file(tensor, filename, name):
     # 保存张量的形状和数据到文件
     with open(filename, 'a') as f:
