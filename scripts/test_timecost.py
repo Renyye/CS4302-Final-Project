@@ -39,30 +39,47 @@ for _ in range(1000):
 native_time = run_benchmark(torch.matmul, "Native matmul")
 
 
-# Benchmark Custom matMul_cuda_v1
-custom_v1_time = run_benchmark(custom_ops.custom_matMul_cuda_v, "Custom matMul_cuda_vv")
-print(f"Performance ratio: {100 * native_time / custom_v1_time:.2f}%")
+for func,name in [(custom_ops.custom_matMul_cuda_v1, "Custom matMul_cuda_v1"),
+                  (custom_ops.custom_matMul_cuda_v2, "Custom matMul_cuda_v2"),
+                  (custom_ops.custom_matMul_cuda_v3, "Custom matMul_cuda_v3"),
+                  (custom_ops.custom_matMul_cuda_v4, "Custom matMul_cuda_v4"),
+                  (custom_ops.custom_matMul_cuda_v5, "Custom matMul_cuda_v5")]:
+    custom_time = run_benchmark(func, name)
+    print(f"Performance ratio: {100 * native_time / custom_time:.2f}%")
+    run_correctness(torch.matmul, func)
 
-# Correctness Test for Custom matMul_cuda_v1
-run_correctness(torch.matmul, custom_ops.custom_matMul_cuda_v1)
 
-# Benchmark Custom matMul_cuda_v2
-custom_v2_time = run_benchmark(custom_ops.custom_matMul_cuda_v2, "Custom matMul_cuda_v2")
-print(f"Performance ratio: {100 * native_time / custom_v2_time:.2f}%")
+# # Benchmark Custom matMul_cuda_v1
+# custom_v1_time = run_benchmark(custom_ops.custom_matMul_cuda_v1, "Custom matMul_cuda_v1")
+# print(f"Performance ratio: {100 * native_time / custom_v1_time:.2f}%")
 
-# Correctness Test for Custom matMul_cuda_v2
-run_correctness(torch.matmul, custom_ops.custom_matMul_cuda_v2)
+# # Correctness Test for Custom matMul_cuda_v1
+# run_correctness(torch.matmul, custom_ops.custom_matMul_cuda_v1)
 
-# Benchmark Custom matMul_cuda_v3
-custom_v3_time = run_benchmark(custom_ops.custom_matMul_cuda_v3, "Custom matMul_cuda_v3")
-print(f"Performance ratio: {100 * native_time / custom_v3_time:.2f}%")
+# # Benchmark Custom matMul_cuda_v1
+# custom_v1_time = run_benchmark(custom_ops.custom_matMul_cuda_v, "Custom matMul_cuda_vv")
+# print(f"Performance ratio: {100 * native_time / custom_v1_time:.2f}%")
 
-# Correctness Test for Custom matMul_cuda_v3
-run_correctness(torch.matmul, custom_ops.custom_matMul_cuda_v3)
+# # Correctness Test for Custom matMul_cuda_v1
+# run_correctness(torch.matmul, custom_ops.custom_matMul_cuda_v)
 
-# Benchmark Custom matMul_cuda
-custom_time = run_benchmark(custom_ops.custom_matMul_cuda, "Custom matMul_cuda_v4")
-print(f"Performance ratio: {100 * native_time / custom_time:.2f}%")
+# # Benchmark Custom matMul_cuda_v2
+# custom_v2_time = run_benchmark(custom_ops.custom_matMul_cuda_v2, "Custom matMul_cuda_v2")
+# print(f"Performance ratio: {100 * native_time / custom_v2_time:.2f}%")
 
-# Correctness Test for Custom matMul_cuda
-run_correctness(torch.matmul, custom_ops.custom_matMul_cuda)
+# # Correctness Test for Custom matMul_cuda_v2
+# run_correctness(torch.matmul, custom_ops.custom_matMul_cuda_v2)
+
+# # Benchmark Custom matMul_cuda_v3
+# custom_v3_time = run_benchmark(custom_ops.custom_matMul_cuda_v3, "Custom matMul_cuda_v3")
+# print(f"Performance ratio: {100 * native_time / custom_v3_time:.2f}%")
+
+# # Correctness Test for Custom matMul_cuda_v3
+# run_correctness(torch.matmul, custom_ops.custom_matMul_cuda_v3)
+
+# # Benchmark Custom matMul_cuda
+# custom_time = run_benchmark(custom_ops.custom_matMul_cuda, "Custom matMul_cuda_v4")
+# print(f"Performance ratio: {100 * native_time / custom_time:.2f}%")
+
+# # Correctness Test for Custom matMul_cuda
+# run_correctness(torch.matmul, custom_ops.custom_matMul_cuda)
