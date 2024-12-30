@@ -18,6 +18,8 @@ setup(
                 'src/custom_ops/csrc/softmax_kernelv3.cu',
                 'src/custom_ops/csrc/transpose_kernelv1.cu',
                 'src/custom_ops/csrc/transpose_kernelv2.cu',
+                'src/custom_ops/csrc/transpose_kernelv3.cu',
+                'src/custom_ops/csrc/transpose_kernelv4.cu',
                 # 'src/custom_ops/csrc/bmm_kernel.cu',
                 # 'src/custom_ops/csrc/vecAdd_kernel.cu',
                 # 'src/custom_ops/csrc/matAdd_kernel.cu',

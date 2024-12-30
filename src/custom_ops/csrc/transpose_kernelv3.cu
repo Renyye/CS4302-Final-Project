@@ -4,20 +4,39 @@
 
 #define TILE_DIM 32
 
-__global__ void custom_transpose_kernel_v1(const float *d_A, float *d_T, int width, int height) {
+__global__ void custom_transpose_kernel_v3(const float *d_A, float *d_T, int width, int height) {
+    __shared__ float tile[TILE_DIM][TILE_DIM + 1];  // 增加1个元素，避免bank conflict
+
+    // 计算输入矩阵的索引
     int xIndex = blockIdx.x * TILE_DIM + threadIdx.x;
     int yIndex = blockIdx.y * TILE_DIM + threadIdx.y;
 
-    int index_A = xIndex + width * yIndex;
-    int index_T = yIndex + height * xIndex;
+    // 输入矩阵中的线性索引
+    int index_A = yIndex * width + xIndex;
+    
+    // 计算转置后的索引
+    int index_T = xIndex * height + yIndex;
 
-    for (int i = 0; i < TILE_DIM; i += blockDim.x) {
-        d_T[index_T + i] = d_A[index_A + i * width];
+    // 读取数据到共享内存，注意不要越界
+    if (xIndex < width && yIndex < height) {
+        tile[threadIdx.y][threadIdx.x] = d_A[index_A];
+    }
+    __syncthreads();
+
+    // 修改索引以适应转置后的顺序
+    xIndex = blockIdx.y * TILE_DIM + threadIdx.x;
+    yIndex = blockIdx.x * TILE_DIM + threadIdx.y;
+    index_T = yIndex * height + xIndex;
+
+    // 写回转置后的数据到输出矩阵，注意不要越界
+    if (xIndex < height && yIndex < width) {
+        d_T[index_T] = tile[threadIdx.x][threadIdx.y];
     }
 }
 
 
-at::Tensor custom_transpose_v1(at::Tensor A, int dim_x, int dim_y) {
+
+at::Tensor custom_transpose_v3(at::Tensor A, int dim_x, int dim_y) {
     int dims = A.dim();
     
     // 处理二维矩阵
@@ -30,7 +49,7 @@ at::Tensor custom_transpose_v1(at::Tensor A, int dim_x, int dim_y) {
             dim3 block(TILE_DIM, TILE_DIM);
             dim3 grid((width + block.x - 1) / block.x, (height + block.y - 1) / block.y);
 
-            custom_transpose_kernel_v1<<<grid, block>>>(
+            custom_transpose_kernel_v3<<<grid, block>>>(
                 A.data_ptr<float>(),
                 output.data_ptr<float>(),
                 width,
@@ -43,7 +62,7 @@ at::Tensor custom_transpose_v1(at::Tensor A, int dim_x, int dim_y) {
             dim3 block(TILE_DIM, TILE_DIM);
             dim3 grid((height + block.x - 1) / block.x, (width + block.y - 1) / block.y);
 
-            custom_transpose_kernel_v1<<<grid, block>>>(
+            custom_transpose_kernel_v3<<<grid, block>>>(
                 A.data_ptr<float>(),
                 output.data_ptr<float>(),
                 height,
@@ -65,7 +84,7 @@ at::Tensor custom_transpose_v1(at::Tensor A, int dim_x, int dim_y) {
             dim3 block(TILE_DIM, TILE_DIM);
             dim3 grid((E + block.x - 1) / block.x, (B + block.y - 1) / block.y);
 
-            custom_transpose_kernel_v1<<<grid, block>>>(
+            custom_transpose_kernel_v3<<<grid, block>>>(
                 A.data_ptr<float>(),
                 output.data_ptr<float>(),
                 E,
@@ -78,7 +97,7 @@ at::Tensor custom_transpose_v1(at::Tensor A, int dim_x, int dim_y) {
             dim3 block(TILE_DIM, TILE_DIM);
             dim3 grid((S + block.x - 1) / block.x, (B + block.y - 1) / block.y);
 
-            custom_transpose_kernel_v1<<<grid, block>>>(
+            custom_transpose_kernel_v3<<<grid, block>>>(
                 A.data_ptr<float>(),
                 output.data_ptr<float>(),
                 S,
@@ -91,7 +110,7 @@ at::Tensor custom_transpose_v1(at::Tensor A, int dim_x, int dim_y) {
             dim3 block(TILE_DIM, TILE_DIM);
             dim3 grid((B + block.x - 1) / block.x, (S + block.y - 1) / block.y);
 
-            custom_transpose_kernel_v1<<<grid, block>>>(
+            custom_transpose_kernel_v3<<<grid, block>>>(
                 A.data_ptr<float>(),
                 output.data_ptr<float>(),
                 B,

@@ -13,6 +13,8 @@ at::Tensor custom_softmax_cuda_v2(at::Tensor input, int dim);
 at::Tensor custom_softmax_cuda_v3(at::Tensor input, int dim);
 at::Tensor custom_transpose_v1(at::Tensor A, int dim_x=0, int dim_y=1);
 at::Tensor custom_transpose_v2(at::Tensor A, int dim_x=0, int dim_y=1);
+at::Tensor custom_transpose_v3(at::Tensor A, int dim_x=0, int dim_y=1);
+at::Tensor custom_transpose_v4(at::Tensor A, int dim_x=0, int dim_y=1);
 // at::Tensor custom_softmax_cuda(at::Tensor input, int dim);
 // at::Tensor custom_bmm(at::Tensor A, at::Tensor B);
 // at::Tensor custom_vecAdd(at::Tensor A, at::Tensor B);
@@ -36,6 +38,18 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
         py::arg("dim_x") = 0,
         py::arg("dim_y") = 1);
     m.def("custom_transpose_cuda_v2", &custom_transpose_v2, "Custom Transpose",
+        py::arg("A"),
+        py::arg("dim_x") = 0,
+        py::arg("dim_y") = 1);
+    m.def("custom_transpose_cuda_v3", &custom_transpose_v3, "Custom Transpose",
+        py::arg("A"),
+        py::arg("dim_x") = 0,
+        py::arg("dim_y") = 1);
+    m.def("custom_transpose_cuda_v4", &custom_transpose_v4, "Custom Transpose",
+        py::arg("A"),
+        py::arg("dim_x") = 0,
+        py::arg("dim_y") = 1);
+    m.def("custom_transpose_cuda", &custom_transpose_v4, "Custom Transpose",
         py::arg("A"),
         py::arg("dim_x") = 0,
         py::arg("dim_y") = 1);

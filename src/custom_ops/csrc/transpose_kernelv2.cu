@@ -2,7 +2,7 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 
-#define TILE_DIM 16
+#define TILE_DIM 32
 
 __global__ void custom_transpose_kernel_v2(const float *d_A, float *d_T, int width, int height) {
     __shared__ float tile[TILE_DIM][TILE_DIM];
