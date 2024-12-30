@@ -27,10 +27,8 @@ __global__ void custom_softmax_kernel_v1(float* out, const float* inp, int N, in
 }
 
 at::Tensor custom_softmax_cuda_v1(at::Tensor input, int dim) {
-    // Ensure the input tensor is contiguous
     input = input.contiguous();
 
-    // Get the number of dimensions
     int ndim = input.dim();
     TORCH_CHECK(dim >= 0 && dim < ndim, "Dimension out of range");
 
@@ -43,7 +41,6 @@ at::Tensor custom_softmax_cuda_v1(at::Tensor input, int dim) {
         }
     }
 
-    // Prepare the output tensor
     auto output = at::empty_like(input);
 
     // Define CUDA kernel launch parameters
