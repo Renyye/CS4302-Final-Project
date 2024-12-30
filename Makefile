@@ -1,7 +1,7 @@
 build: FORCE
 	pip uninstall custom_ops -y
 	python setup.py clean
-	python setup.py install -- -j 8
+	python setup.py install
 
 
 
