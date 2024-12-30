@@ -39,12 +39,7 @@ for _ in range(1000):
 native_time = run_benchmark(torch.matmul, "Native matmul")
 
 
-for func,name in [(custom_ops.custom_matMul_cuda_v1, "Custom matMul_cuda_v1"),
-                  (custom_ops.custom_matMul_cuda_v2, "Custom matMul_cuda_v2"),
-                  (custom_ops.custom_matMul_cuda_v3, "Custom matMul_cuda_v3"),
-                  (custom_ops.custom_matMul_cuda_v4, "Custom matMul_cuda_v4"),
-                  (custom_ops.custom_matMul_cuda, "Custom matMul_cuda_v5")]:
+for func,name in [(custom_ops.custom_softmax_cuda, "Custom softmax_cuda_v1"),]:
     custom_time = run_benchmark(func, name)
     print(f"Performance ratio: {100 * native_time / custom_time:.2f}%")
     run_correctness(torch.matmul, func)
-
