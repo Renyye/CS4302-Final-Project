@@ -8,7 +8,11 @@ setup(
             name='custom_ops', 
             sources=[
                 'src/custom_ops/csrc/main_ops.cpp',
-                'src/custom_ops/csrc/mm_kernel.cu',
+                'src/custom_ops/csrc/mm_kernelv1.cu',
+                'src/custom_ops/csrc/mm_kernelv2.cu',
+                'src/custom_ops/csrc/mm_kernelv3.cu',
+                'src/custom_ops/csrc/mm_kernelv4.cu',
+                'src/custom_ops/csrc/mm_kernelvv.cu',
                 # 'src/custom_ops/csrc/bmm_kernel.cu',
                 # 'src/custom_ops/csrc/vecAdd_kernel.cu',
                 # 'src/custom_ops/csrc/transpose_kernel.cu',
