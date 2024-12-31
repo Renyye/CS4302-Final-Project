@@ -6,8 +6,8 @@
 
 __global__ void custom_matMul_kernel_v2(float *d_A, float *d_B, float *d_C, int M, int N, int P) {
     // 定义共享内存用于存储块内子矩阵
-    __shared__ float tile_A[TILE_WIDTH][TILE_WIDTH];
-    __shared__ float tile_B[TILE_WIDTH][TILE_WIDTH];
+    __shared__ float tile_As[TILE_WIDTH][TILE_WIDTH];
+    __shared__ float tile_Bs[TILE_WIDTH][TILE_WIDTH];
 
     int row = blockIdx.y * blockDim.y + threadIdx.y;
     int col = blockIdx.x * blockDim.x + threadIdx.x;
@@ -18,22 +18,22 @@ __global__ void custom_matMul_kernel_v2(float *d_A, float *d_B, float *d_C, int 
     for (int t = 0; t < (N + TILE_WIDTH - 1) / TILE_WIDTH; ++t) {
         // 加载 A 和 B 的块到共享内存
         if (row < M && t * TILE_WIDTH + threadIdx.x < N) {
-            tile_A[threadIdx.y][threadIdx.x] = d_A[row * N + t * TILE_WIDTH + threadIdx.x];
+            tile_As[threadIdx.y][threadIdx.x] = d_A[row * N + t * TILE_WIDTH + threadIdx.x];
         } else {
-            tile_A[threadIdx.y][threadIdx.x] = 0.0f;
+            tile_As[threadIdx.y][threadIdx.x] = 0.0f;
         }
 
         if (col < P && t * TILE_WIDTH + threadIdx.y < N) {
-            tile_B[threadIdx.y][threadIdx.x] = d_B[(t * TILE_WIDTH + threadIdx.y) * P + col];
+            tile_Bs[threadIdx.y][threadIdx.x] = d_B[(t * TILE_WIDTH + threadIdx.y) * P + col];
         } else {
-            tile_B[threadIdx.y][threadIdx.x] = 0.0f;
+            tile_Bs[threadIdx.y][threadIdx.x] = 0.0f;
         }
 
         __syncthreads(); // 确保共享内存加载完成
 
         // 计算块内的乘积
         for (int i = 0; i < TILE_WIDTH; ++i) {
-            sum += tile_A[threadIdx.y][i] * tile_B[i][threadIdx.x];
+            sum += tile_As[threadIdx.y][i] * tile_Bs[i][threadIdx.x];
         }
 
         __syncthreads(); // 确保计算完成后再加载下一块

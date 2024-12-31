@@ -10,7 +10,7 @@ def run_benchmark(softmax_func, label, iterations=1000, size=(2048, 1024)):
     # 运行多次计算，获取平均时间
     start = time.time()
     for _ in range(iterations):
-        C = softmax_func(A, 1)  # 这里传递维度1作为位置参数
+        C = softmax_func(A, 1)
     torch.cuda.synchronize()  # 同步GPU计算
     end = time.time()
     elapsed = end - start
@@ -23,8 +23,8 @@ def run_correctness(reference_func, test_func, size=(2048, 1024), atol=1e-4):
     # 创建一个固定大小的输入张量
     A = torch.randn(size[0], size[1], device='cuda')
     # 计算参考值和测试值
-    C_ref = reference_func(A, 1)  # 这里传递维度1作为位置参数
-    C_test = test_func(A, 1)  # 这里传递维度1作为位置参数
+    C_ref = reference_func(A, 1)
+    C_test = test_func(A, 1)
 
     # 检查两者的相对误差
     if torch.allclose(C_ref, C_test, atol=atol):

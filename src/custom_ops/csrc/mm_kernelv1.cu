@@ -11,7 +11,6 @@ __global__ void custom_matMul_kernel_v1(float *d_A, float *d_B, float *d_C, int 
     if(row < M && col < P) {
         float sum = 0.0f;
 
-        // compute the dot product for each row of A and col of B
         for(int i = 0; i < N; ++i) {
             sum += d_A[row * N + i] * d_B[i * P + col];
         }

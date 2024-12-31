@@ -23,27 +23,21 @@ __global__ void custom_matMul_kernel_v4(
     const int tx = threadIdx.x;
     const int ty = threadIdx.y;
 
-    // 计算线程一维 ID (tid)，用于加载/存储分配
-    // tid = ty * blockDim.x + tx
+    // 计算线程一维 ID (tid)
     const int tid = ty * blockDim.x + tx;
 
-    // 分配共享内存: s_a[128][8], s_b[8][128]
     __shared__ float s_a[BM][BK];  // 128 x 8
     __shared__ float s_b[BK][BN];  //   8 x 128
 
     // 每线程的寄存器块 8x8
     float r_c[TM][TN] = {0.0f};
 
-    // -----------------------------------
-    // 预先计算好加载共享内存的坐标
-    // -----------------------------------
-    // 加载 A 到 s_a 的坐标
+
     //  - load_a_smem_m: s_a 的行 (0~127)
     //  - load_a_smem_k: s_a 的列 (0,4) (因为一次加载 float4, 跨度为4)
     int load_a_smem_m = tid >> 1;         // tid / 2
     int load_a_smem_k = (tid & 1) << 2;   // (tid % 2 == 0) ? 0 : 4
 
-    // 加载 B 到 s_b 的坐标
     //  - load_b_smem_k: s_b 的行 (0~7)   (tid / 32)
     //  - load_b_smem_n: s_b 的列 (0~127) (因为一次加载 float4, 跨度为4)
     int load_b_smem_k = tid >> 5;         // tid / 32
@@ -53,9 +47,7 @@ __global__ void custom_matMul_kernel_v4(
     int load_a_gmem_m = by * BM + load_a_smem_m;
     int load_b_gmem_n = bx * BN + load_b_smem_n;
 
-    // -----------------------------------
     // 循环遍历 K 方向 tile
-    // -----------------------------------
     int tiles = (K + BK - 1) / BK; // 向上取整
     for (int bk = 0; bk < tiles; bk++)
     {
@@ -87,9 +79,7 @@ __global__ void custom_matMul_kernel_v4(
 
         __syncthreads();
 
-        // -----------------------------------
         // 进行本 tile 的乘加
-        // -----------------------------------
         #pragma unroll
         for (int k = 0; k < BK; k++)
         {
@@ -110,10 +100,8 @@ __global__ void custom_matMul_kernel_v4(
         __syncthreads();
     }
 
-    // -----------------------------------
     // 将结果写回全局内存
-    //   每次写回一个 float4
-    // -----------------------------------
+    // 每次写回一个 float4
     #pragma unroll
     for (int i = 0; i < TM; i++)
     {

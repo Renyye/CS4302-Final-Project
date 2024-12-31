@@ -3,6 +3,7 @@
 #include <cuda_runtime.h>
 #include <math.h>
 
+// Version 1
 __global__ void custom_softmax_kernel_v1(float* out, const float* inp, int N, int C) {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
     if (i < N) {

@@ -5,22 +5,7 @@
 #define OFFSET(row, col, ld) ((row) * (ld) + (col))
 #define FLOAT4(pointer) (reinterpret_cast<float4*>(&(pointer))[0])
 
-/**
- * sgemm_V3 Kernel:
- * 实现分块 (Block Tiling) + 向量化 (float4) 访问 + 双缓冲共享内存(double buffering) 的矩阵乘法。
- *
- * 矩阵大小:
- *    C(MxN) = A(MxK) * B(KxN)
- *
- * 需要配置 gridDim, blockDim:
- *    - 每个 block 处理 128x128 大小的输出 (BM=128, BN=128)
- *    - 在 K 方向上以 8 为步长进行分块 (BK=8)
- *    - 每个线程内再做 8x8 (TM=8, TN=8) 的寄存器块计算
- *
- * 输入参数:
- *    a, b, c : 分别为 A, B, C 矩阵在全局显存中的指针 (row-major)
- *    M, N, K : 矩阵尺寸
- */
+
 __global__ void custom_matMul_kernel_v5(
     float * __restrict__ a, 
     float * __restrict__ b, 
@@ -29,18 +14,14 @@ __global__ void custom_matMul_kernel_v5(
     const int N, 
     const int K) 
 {
-    // -----------------------------
-    // 设定分块/线程级别参数
-    // -----------------------------
+
     const int BM = 128;  // block 在行方向上覆盖 128 行
     const int BN = 128;  // block 在列方向上覆盖 128 列
     const int BK = 8;    // K方向一次处理 8
     const int TM = 8;    // 每个线程计算 8 行结果
     const int TN = 8;    // 每个线程计算 8 列结果
 
-    // -----------------------------
     // block, thread 索引
-    // -----------------------------
     const int bx = blockIdx.x;   // block 在列方向上的编号
     const int by = blockIdx.y;   // block 在行方向上的编号
     const int tx = threadIdx.x;  
@@ -49,30 +30,23 @@ __global__ void custom_matMul_kernel_v5(
     // 每个线程的线性 ID, tid = ty * blockDim.x + tx
     const int tid = ty * blockDim.x + tx;
 
-    // -----------------------------
-    // 分配共享内存 
+
     //   s_a[2][8][128], s_b[2][8][128]
     //   双缓冲, 每个 buffer 大小为 BK x BM / BK x BN
-    // -----------------------------
     __shared__ float s_a[2][BK][BM];
     __shared__ float s_b[2][BK][BN];
 
-    // -----------------------------
     // 寄存器中需要的临时数组
     //   r_load_a, r_load_b 用于加载 float4
     //   r_comp_a, r_comp_b 用于单次计算的 A/B 行或列
     //   r_c_reg[TM][TN] 用于累加结果
-    // -----------------------------
     float r_load_a[4];         
     float r_load_b[4];
     float r_comp_a[TM];
     float r_comp_b[TN];
     float r_c_reg[TM][TN] = {0.0};  // 初始化为 0
 
-    // -----------------------------
     // 预先计算部分共享内存加载索引
-    //  (参考代码中使用的位运算技巧)
-    // -----------------------------
     // load_a_smem_m: 在 s_a[?][?][BM] 第三维里的“行”索引
     // load_a_smem_k: 在 s_a[?][BK][?]  第二维里的“列”索引
     int load_a_smem_m = tid >> 1;         // = tid / 2
@@ -83,15 +57,11 @@ __global__ void custom_matMul_kernel_v5(
     int load_b_smem_k = tid >> 5;         // = tid / 32
     int load_b_smem_n = (tid & 31) << 2;  // = (tid % 32)*4
 
-    // -----------------------------
     // 计算全局内存首地址 (行块,列块)
-    // -----------------------------
     int load_a_gmem_m = by * BM + load_a_smem_m; // A 的行坐标
     int load_b_gmem_n = bx * BN + load_b_smem_n; // B 的列坐标
 
-    //==================================================
     // 第一次加载 (bk=0 对应的分块)
-    //==================================================
     {
         int load_a_gmem_k = load_a_smem_k; // K方向从 0 开始
         int load_a_gmem_addr = OFFSET(load_a_gmem_m, load_a_gmem_k, K);
@@ -114,9 +84,7 @@ __global__ void custom_matMul_kernel_v5(
 
     __syncthreads();
 
-    //==================================================
     // 主循环: 遍历所有 K 分块 (从 1 开始)
-    //==================================================
     for (int bk = 1; bk < (K + BK - 1) / BK; bk++)
     {
         // smem_sel 与 smem_sel_next 用于双缓冲切换
@@ -167,9 +135,7 @@ __global__ void custom_matMul_kernel_v5(
         __syncthreads();
     }
 
-    //==================================================
     // 处理最后一块 (也即 bk = tiles-1 对应 buffer 1)
-    //==================================================
     #pragma unroll
     for (int tk = 0; tk < BK; tk++)
     {
@@ -190,9 +156,7 @@ __global__ void custom_matMul_kernel_v5(
         }
     }
 
-    //==================================================
     // 将 8x8 的寄存器结果写回全局内存
-    //==================================================
     // 分 4 次 (每次 float4) 写回 C
     #pragma unroll
     for (int i = 0; i < TM / 2; i++)
@@ -219,9 +183,7 @@ __global__ void custom_matMul_kernel_v5(
     }
 }
 
-// ------------------------
-// 3. 封装函数
-// ------------------------
+
 at::Tensor custom_matrix_mul_v5(
     at::Tensor A,  // [M, K]
     at::Tensor B   // [K, N]
@@ -242,9 +204,6 @@ at::Tensor custom_matrix_mul_v5(
     // 创建输出 [M, N]
     auto C = torch::zeros({M, N}, A.options());
 
-    // 输出A,B, 用printf
-    // std::cout << "A: " << A << std::endl;
-    // std::cout << "B: " << B << std::endl;
 
 
     // 获取原始指针
@@ -254,7 +213,6 @@ at::Tensor custom_matrix_mul_v5(
 
     // 配置 block / grid
     // 与内核的 BM=128, BN=128, TM=8, TN=8 对应
-    // blockDim = (BN/TN=16, BM/TM=16)
     dim3 blockDim(16, 16);
 
     // gridDim = ( (N+BN-1)/BN, (M+BM-1)/BM )

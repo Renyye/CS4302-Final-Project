@@ -32,17 +32,12 @@ __global__ void custom_matMul_kernel_v3(
     // 计算要分多少次 tile 才能覆盖完 K
     int num_tiles = (K + BK - 1) / BK;
 
-    // -----------------------------
-    // 为 A、B 分配共享内存 (更合理的排布)
-    //   s_a:  128 x 8
-    //   s_b:    8 x 128
-    // -----------------------------
+
     __shared__ float s_a[BM][BK];  // = [128][8]
     __shared__ float s_b[BK][BN];  // = [8][128]
 
-    // -----------------------------
+
     // 每个线程维护一个 8x8 的累加寄存器块
-    // -----------------------------
     float r_c[TM][TN];
     #pragma unroll
     for (int i = 0; i < TM; i++)
@@ -54,18 +49,11 @@ __global__ void custom_matMul_kernel_v3(
         }
     }
 
-    // -----------------------------
     // 遍历所有的 tile (在K方向)
-    // -----------------------------
     for (int tile = 0; tile < num_tiles; tile++)
     {
         // 1) 把 A 的一块 [128 x BK] 加载到 s_a
-        //    这里让 (threadIdx.x, threadIdx.y) 通过小循环分担所有元素
         {
-            // A 的全局起始: (block_start_row, tile*BK)
-            // A 的大小: M x K
-            // s_a 的大小: 128 x 8
-            // 我们让每个线程通过 2D 循环把需要的元素搬到共享内存
 
             for (int i = ty; i < 128; i += blockDim.y)    // blockDim.y=16
             {
@@ -83,10 +71,6 @@ __global__ void custom_matMul_kernel_v3(
 
         // 2) 把 B 的一块 [BK x 128] 加载到 s_b
         {
-            // B 的全局起始: (tile*BK, block_start_col)
-            // B 的大小: K x N
-            // s_b 的大小: 8 x 128
-            // 同理，每个线程通过 2D 循环把 B 分块加载进来
 
             for (int i = ty; i < BK;   i += blockDim.y)    // BK=8
             {
@@ -106,12 +90,7 @@ __global__ void custom_matMul_kernel_v3(
         __syncthreads();
 
         // 3) 做本 tile 的乘加运算
-        //    对 s_a [128 x 8] 和 s_b [8 x 128]
-        //    每个线程要完成 8x8 的结果累加
         {
-            // 先确定线程在 s_a、s_b 中读取的行/列范围
-            // 每个线程在 C 中对 (ty*TM + i, tx*TN + j) 那些行列负责
-            // 逐列 (k) 做乘加
             #pragma unroll
             for (int k = 0; k < BK; k++)
             {
@@ -132,9 +111,7 @@ __global__ void custom_matMul_kernel_v3(
         __syncthreads();
     }
 
-    // -----------------------------
     // 写回结果到全局内存
-    // -----------------------------
     for (int i = 0; i < TM; i++)
     {
         int c_row = block_start_row + ty*TM + i;
