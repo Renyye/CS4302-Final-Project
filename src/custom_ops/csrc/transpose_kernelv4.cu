@@ -22,8 +22,7 @@ __global__ void custom_transpose_kernel_v4(float *odata, float *idata, int width
         blockIdx_x = ((bid / gridDim.y) + blockIdx_y) % gridDim.x;
     }
 
-    // from here on the code is same as previous kernel except blockIdx_x replaces
-    // blockIdx.x and similarly for y
+    // 以下代码与 V3 一致
 
     int xIndex = blockIdx_x * TILE_DIM + threadIdx.x;
     int yIndex = blockIdx_y * TILE_DIM + threadIdx.y;

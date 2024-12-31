@@ -16,7 +16,7 @@ at::Tensor custom_transpose_v2(at::Tensor A, int dim_x=0, int dim_y=1);
 at::Tensor custom_transpose_v3(at::Tensor A, int dim_x=0, int dim_y=1);
 at::Tensor custom_transpose_v4(at::Tensor A, int dim_x=0, int dim_y=1);
 // at::Tensor custom_softmax_cuda(at::Tensor input, int dim);
-// at::Tensor custom_bmm(at::Tensor A, at::Tensor B);
+at::Tensor custom_bmm(at::Tensor A, at::Tensor B);
 // at::Tensor custom_vecAdd(at::Tensor A, at::Tensor B);
 // at::Tensor custom_transpose(at::Tensor A);
 // at::Tensor custom_matAdd(at::Tensor A, at::Tensor B);
@@ -49,9 +49,10 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
         py::arg("A"),
         py::arg("dim_x") = 0,
         py::arg("dim_y") = 1);
-    m.def("custom_transpose_cuda", &custom_transpose_v4, "Custom Transpose",
+    m.def("custom_transpose_cuda", &custom_transpose_v3, "Custom Transpose",
         py::arg("A"),
         py::arg("dim_x") = 0,
         py::arg("dim_y") = 1);
+    m.def("custom_bmm_cuda", &custom_bmm, "Batch Matrix Multiplication");
 
 }
