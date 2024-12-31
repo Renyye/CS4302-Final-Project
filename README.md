@@ -64,7 +64,7 @@ Performance ratio: 10.65%
 
 测试脚本具体内容参见 `./scripts` 文件夹，自定义 Transformer 模块参见 `./src/transformer` 文件夹。
 
-一些结果的相应性能分析参见 `./Document/Report.md` 各算子对应模块。
+**完整报告**与一些结果的相应性能分析参见 `./Document/Report.md` 各算子对应模块。
 
 ## 如何自行添加算子？
 
