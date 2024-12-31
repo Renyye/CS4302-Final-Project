@@ -89,29 +89,60 @@ __global__ void custom_softmax_kernel_v3(float* out, const float* inp, int N, in
 
 // 定义 PyTorch 接口
 at::Tensor custom_softmax_cuda_v3(at::Tensor input, int dim) {
-    // 确保输入是在 GPU 上
+    // 确保输入在 GPU 上
     TORCH_CHECK(input.is_cuda(), "Input tensor must be a CUDA tensor.");
 
-    // 获取输入张量的形状
-    int N = input.size(0);  // 批次大小
-    int C = input.size(1);  // 类别数
-
-    // 创建输出张量
-    auto output = torch::empty_like(input);
-
-    // 设置线程块和网格的大小
-    const int threadsPerBlock = 256;  // 每个线程块的线程数
-    const int blocks = N;  // 网格中的块数，N为批次大小
-
-    // 调用 CUDA 核函数
-    custom_softmax_kernel_v3<<<blocks, threadsPerBlock, threadsPerBlock * sizeof(float)>>>(
-        output.data_ptr<float>(), input.data_ptr<float>(), N, C
+    // 对于 2D 情况: (N, C)，默认对 dim=1 做 softmax
+    // 对于 3D 情况: (B, S, E)，若 dim=2，则合并前两个维度，使用同一个 kernel
+    auto shape = input.sizes();
+    TORCH_CHECK(
+        shape.size() == 2 || shape.size() == 3,
+        "Only 2D or 3D tensors are supported by this custom softmax."
     );
 
-    // 检查 CUDA 内核的启动错误
-    cudaError_t err = cudaGetLastError();
-    TORCH_CHECK(err == cudaSuccess, "CUDA kernel launch failed: ", cudaGetErrorString(err));
+    // block / grid 配置
+    const int threadsPerBlock = 256;
 
-    // 返回结果
-    return output;
+    if (shape.size() == 2) {
+        // 2D 输入 [N, C]
+        int N = shape[0];
+        int C = shape[1];
+        // 若仅指定 dim=1，则直接调用
+        TORCH_CHECK(
+            dim == 1,
+            "For a 2D tensor, only dim=1 is supported in this custom softmax."
+        );
+
+        auto output = torch::empty_like(input);
+        custom_softmax_kernel_v3<<<N, threadsPerBlock, threadsPerBlock * sizeof(float)>>>(
+            output.data_ptr<float>(),
+            input.data_ptr<float>(),
+            N, C
+        );
+        TORCH_CHECK(cudaGetLastError() == cudaSuccess, "CUDA kernel launch failed!");
+        return output;
+    } else {
+        // 3D 输入 [B, S, E]
+        // 如果 dim=2，则对最后一个维度做 softmax
+        TORCH_CHECK(dim == 2, "For a 3D tensor, this custom softmax only supports dim=2.");
+        int B = shape[0];
+        int S = shape[1];
+        int E = shape[2];
+
+        // 将前面两个维度合并成 N=B*S，并按 C=E，使用 kernel
+        auto input_2d = input.view({B * S, E});
+        auto output_2d = torch::empty_like(input_2d);
+
+        const int N = B * S;
+        const int C = E;
+        custom_softmax_kernel_v3<<<N, threadsPerBlock, threadsPerBlock * sizeof(float)>>>(
+            output_2d.data_ptr<float>(),
+            input_2d.data_ptr<float>(),
+            N, C
+        );
+        TORCH_CHECK(cudaGetLastError() == cudaSuccess, "CUDA kernel launch failed!");
+
+        // reshape 回原来的形状
+        return output_2d.view({B, S, E});
+    }
 }

@@ -3,25 +3,36 @@ build: FORCE
 	python setup.py clean
 	python setup.py install
 
-
-
 benchmark_mm:
-	python scripts/benchmark_mm.py
+	@echo "Testing MatMul Kernel. May take 30 seconds..."
+	@echo "---------------------------------------------"
+	@python scripts/benchmark_mm.py
+	@echo "---------------------------------------------"
+
+benchmark_softmax:
+	@echo "Testing Softmax Kernel. May take 10 seconds..."
+	@echo "---------------------------------------------"
+	@python scripts/benchmark_softmax.py
+	@echo "---------------------------------------------"
+
+benchmark_transpose:
+	@echo "Testing Transpose Kernel. May take 20 seconds..."
+	@echo "---------------------------------------------"
+	@python scripts/benchmark_transpose.py
+	@echo "---------------------------------------------"
+
+benchmark_trans:
+	@echo "Testing Custom Transformer. May take 20 seconds..."
+	@echo "---------------------------------------------"
+	@python src/transformer/benchmark.py
+	@echo "---------------------------------------------"
+
+benchmark_all: benchmark_mm benchmark_softmax benchmark_transpose benchmark_trans
+	@echo "All benchmarks done."
 
 clean:
 	pip uninstall custom_ops -y
 	python setup.py clean
-
-benchmark_trans:
-	python src/transformer/benchmark.py
-
-benchmark_log:
-	rm -f output1.txt output2.txt LinearLog.txt
-	python scripts/benchmark.py
-	diff output1.txt output2.txt
-
-# count:
-# 	python /home/wrt/code/pytorch/tools/kernel_count/kernel_count.py scripts/benchmark.py
 
 .PHONY: FORCE
 FORCE:

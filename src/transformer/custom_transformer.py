@@ -70,14 +70,16 @@ class CustomTransformerLayer(nn.Module):
 
     def _initialize_weights(self):
         for name, param in self.named_parameters():
-            init.constant_(param, 0.01)
+            init.constant_(param, 1)
 
     def forward(self, src):
         Q = self.q_linear(src)  # [B, S, E]
         K = self.k_linear(src)
         V = self.v_linear(src)
 
-        K = custom_ops.custom_transpose_cuda(K)  # [B, E, S]
+
+        K = custom_ops.custom_transpose_cuda(K,1,2)  # [B, E, S]
+
         attn_scores = custom_ops.custom_bmm_cuda(Q, K)  # [B, S, S]
 
         attn_weights = custom_ops.custom_softmax_cuda(attn_scores, 2)
@@ -86,7 +88,7 @@ class CustomTransformerLayer(nn.Module):
         attn_output = self.out_linear(attn_output)  # [B, S, E]
         attn_output = self.dropout(attn_output)
 
-        src = custom_ops.custom_vecAdd_cuda(src, attn_output)  # 残差连接
+        src = src + attn_output  # 残差连接
         src = self.layernorm1(src)
 
         ff_output = self.feedforward1(src)
@@ -94,7 +96,7 @@ class CustomTransformerLayer(nn.Module):
         ff_output = self.feedforward2(ff_output)
         ff_output = self.dropout(ff_output)
 
-        src = custom_ops.custom_vecAdd_cuda(src, ff_output)  # 残差连接
+        src = src + ff_output  # 残差连接
         src = self.layernorm2(src)
 
         return src

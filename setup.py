@@ -16,13 +16,11 @@ setup(
                 'src/custom_ops/csrc/softmax_kernelv1.cu',
                 'src/custom_ops/csrc/softmax_kernelv2.cu',
                 'src/custom_ops/csrc/softmax_kernelv3.cu',
-                # 'src/custom_ops/csrc/bmm_kernel.cu',
-                # 'src/custom_ops/csrc/vecAdd_kernel.cu',
-                # 'src/custom_ops/csrc/transpose_kernel.cu',
-                # 'src/custom_ops/csrc/matAdd_kernel.cu',
-                # 'src/custom_ops/csrc/layerNorm_kernel.cu',
-                # 'src/custom_ops/csrc/relu_kernel.cu',
-                # 其他文件...
+                'src/custom_ops/csrc/transpose_kernelv1.cu',
+                'src/custom_ops/csrc/transpose_kernelv2.cu',
+                'src/custom_ops/csrc/transpose_kernelv3.cu',
+                'src/custom_ops/csrc/transpose_kernelv4.cu',
+                'src/custom_ops/csrc/bmm_kernel.cu',
             ],
             extra_compile_args={'cxx': ['-O3'], 'nvcc': ['-O3']}
         )

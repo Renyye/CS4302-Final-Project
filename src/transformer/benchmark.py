@@ -14,7 +14,7 @@ num_heads = 16
 dim_feedforward = 512
 dropout = 0.2
 batch_size = 16
-seq_length = 40
+seq_length = 32
 
 # num_layers = 2
 # embed_dim = 1
