@@ -652,9 +652,9 @@ Performance ratio: 75.23%
 
 > 额外实现了使用 Shared Memory 的批量矩阵乘法核函数基础版本，在自定义 Transformer 中有使用。
 
-使用以上算子构建了一个 `CustomTransformer`，包含自定义的线性层 `CustomLinear` ，自注意力层 `CustomTransformerLayer` 以及其相应的 forward 方法。所有网络层的初始化参数都已经人为设置，并且在测试前设置了随机数种子以确保结果可以复现，并且可以对比两个 `Transformer` 网络验证以验证自实现算子的正确性。
+使用以上算子构建了一个 `CustomTransformer`，包含自定义的线性层 `CustomLinear` ，自注意力层 `CustomTransformerLayer` 以及其相应的 forward 方法。所有网络层的初始化参数都已经人为设置，并且在测试前设置了随机数种子以确保结果可以复现，并且可以对比自定义的 `CustomTransformer` 与Pytorch原版算子实现的 `NativeTransformer` 验证以验证自实现算子的正确性。
 
-在根目录下运行 `make benchmark_trans`，即可执行 `./src/transformer/benchmark.py` 的测试脚本，其中会执行 2000 次 `transformer` 的 `forward` 函数，并输出用时统计和正确性测试：
+在根目录下运行 `make benchmark_trans`，即可执行 `./src/transformer/benchmark.py` 的测试脚本，其中会分别对两个网络执行 2000 次 `transformer` 的 `forward` 函数，并输出用时统计和正确性测试：
 
 ```bash
 $ make benchmark_trans
