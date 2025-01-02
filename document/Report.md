@@ -167,8 +167,6 @@ Pytorch 实现中，核心逻辑是对一批行执行 softmax 运算。不同 po
 
 PyTorch通过CUDA Runtime API 调用，以实现GPU内存管理、数据传输和并行计算调度等基础功能。
 
-在这一部分中，我们
-
 > 参考资料 https://www.nvidia.cn/docs/IO/51635/NVIDIA_CUDA_Programming_Guide_1.1_chs.pdf
 
 ### 1. `cudaMalloc` 和 `cudaFree`

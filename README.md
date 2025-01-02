@@ -38,7 +38,7 @@
 ## 依赖项
 
 - `Python: 3.8.20`
-- `pytorch: 1.12.1 cuda` 从官网通过 conda 安装或者从源码编译 
+- `pytorch: 1.12.1 cuda` 从官网通过 conda 安装或者从源码编译（只需要能 `#include <torch/extension.h>` 和 `import torch` 即可。不需要在 Pytorch 相关目录下。）
 - `nvcc: cuda_11.3`
 - GPU 环境测试于 `Tesla T4:  Driver Version: 470.182.03  CUDA Version: 11.4`
   以及 `3070Ti Laptop:  Driver Version: 566.03  CUDA Version: 12.7` (nvidia-smi 输出)
@@ -78,7 +78,7 @@ Performance ratio: 10.65%
     - [ ] ~~类似矩阵乘法，还可以有更多优化:  shared_weight_bmm aborted. Use mm instead.~~
     - [x] custom_transpose_cuda
     - [x] custom_softmax_cuda
-    - [x] custom_vecAdd_cuda Aborted
+    - [x] ~~custom_vecAdd_cuda Aborted~~
 - [ ] ~~扩展算子 Aborted~~
     - [x] ~~Self-Attention 部分使用 bmm~~
     - [x] ~~linear 层不需要 bmm，实现一个更好的算子~~
